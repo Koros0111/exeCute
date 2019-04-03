@@ -4,4 +4,5 @@ Icon=/usr/share/icons/hicolor/scalable/apps/exeCute.svg
 MimeType=application/x-ms-dos-executable
 Name=exeCute
 NoDisplay=true
+StartupNotify=true
 Type=Application
