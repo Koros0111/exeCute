@@ -1,0 +1,104 @@
+#! /bin/bash
+
+
+mainFunction () {
+	file="${1}"
+
+	checkFile "${file}"
+	executeFile "${file}"
+}
+
+
+changeToThisProgramDir () {
+	cd "$( dirname "${BASH_SOURCE[0]}" )"
+}
+
+
+checkFile () {
+	file="${1}"
+
+	checkFileNotEmpty "${file}"
+	checkFileExist "${file}"
+	checkFileIsExe "${file}"
+}
+
+
+checkFileExist () {
+	file="${1}"
+
+	if [ ! -f "${file}" ]; then
+		echo "The file doesn't exist: ${file}" >&2
+		echo "If the name was correct either type: exeCute \"pathToYourExeFile\""
+		echo "Or just open with exeCute from the file manager"
+		exit 1
+	fi
+}
+
+
+checkFileIsExe () {
+	file="${1}"
+	mime=$(fileMime "${file}")
+
+	if [ "${mime}" != "application/x-dosexec" ]; then
+		echo "Not an exe: ${file}" >&2
+		exit 1
+	fi
+}
+
+
+checkFileNotEmpty () {
+	file="${1}"
+
+	if [ "${file}" == "" ]; then
+		echo "No file specified" >&2
+		echo "Either type this: exeCute \"pathToYourExeFile\""
+		echo "Or just open with exeCute from the file manager"
+		exit 1
+	fi
+}
+
+
+executeFile () {
+	file="${1}"
+	type=$(fileType "${file}")
+
+	if [ "${type}" == "MS-DOS executable" ]; then
+		silently "executeFile" "dosbox \"${file}\" -forcescaler normal2x -exit -fullscreen"
+	else
+		silently "executeFile" "wine \"${file}\""
+	fi
+}
+
+
+fileMime () {
+	file="${1}"
+
+	attributes=$(file --brief --mime "${file}")
+	IFS=";" read -r -a attributes <<< "${attributes}"
+	echo "${attributes[0]}"
+}
+
+
+fileType () {
+	file="${1}"
+
+	attributes=$(file --brief "${file}")
+	IFS="," read -r -a attributes <<< "${attributes}"
+	echo "${attributes[0]}"
+}
+
+
+silently () {
+	function="${1}"
+	command="${2}"
+	error=$(eval "${command}" 2>&1 >"/dev/null")
+
+	if [ ${?} -ne 0 ]; then
+		echo "${function}: ${error}" >&2
+		exit 1
+	fi
+}
+
+
+changeToThisProgramDir
+mainFunction "${@}"

@@ -1,0 +1,17 @@
+
+
+You can use this software as wished as long as you:
+- Warrant the same rights to any derivative work.
+- Credit the original author.
+- Link to the licenses below.
+- Indicate if changes were made.
+- Suggest it's an independent work.
+
+
+This is an easy to understand summary, without legal validity. For the real licenses see below.
+
+For code (GPL-3.0+):
+https://www.gnu.org/licenses/gpl-3.0.en.html
+
+For everything else (CC-BY-SA-4.0+):
+https://creativecommons.org/licenses/by-sa/4.0/
