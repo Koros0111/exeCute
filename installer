@@ -35,7 +35,7 @@ manageFile () {
 	destiny="${2}"
 
 	if [ "${operation}" == "-install" ]; then
-		silently "${operation}" "cp \"${origin}\" \"${destiny}\""
+		silently "${operation}" "install -D \"${origin}\" \"${destiny}\""
 	elif [ "${operation}" == "-remove" ]; then
 		silently "${operation}" "rm \"${destiny}\""
 	else
