@@ -35,9 +35,9 @@ manageFile () {
 	destiny="${2}"
 
 	if [ "${operation}" == "-install" ]; then
-		silently "${operation}" "install -D \"${origin}\" \"${root}/${destiny}\""
+		silently "${operation}" "install -D \"${origin}\" \"${root}${destiny}\""
 	elif [ "${operation}" == "-remove" ]; then
-		silently "${operation}" "rm \"${root}/${destiny}\""
+		silently "${operation}" "rm \"${root}${destiny}\""
 	else
 		echo "Unkown operation: ${operation}" >&2
 		echo "It should either be \"-install\" or \"-remove\""
