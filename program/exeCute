@@ -9,11 +9,6 @@ mainFunction () {
 }
 
 
-changeToThisProgramDir () {
-	cd "$( dirname "${BASH_SOURCE[0]}" )"
-}
-
-
 checkFile () {
 	file="${1}"
 
@@ -100,5 +95,4 @@ silently () {
 }
 
 
-changeToThisProgramDir
 mainFunction "${@}"
