@@ -17,7 +17,7 @@
 
 
 mainFuntion () {
-	manageFile "exeCute" "usr/bin/exeCute"
+	manageFile "exeCute" "/usr/bin/exeCute"
 	manageFile "exeCute.desktop" "/usr/share/applications/exeCute.desktop"
 	manageFile "exeCute.svg" "/usr/share/icons/hicolor/scalable/apps/exeCute.svg"
 	manageFile "exeCute.1.gz" "/usr/share/man/man1/exeCute.1.gz"
