@@ -60,7 +60,7 @@ executeFile () {
 	if [ "${type}" == "MS-DOS executable" ]; then
 		silently "executeFile" "dosbox \"${file}\" -forcescaler normal2x -exit -fullscreen"
 	else
-		silently "executeFile" "wine \"${file}\""
+		silently "executeFile" "wine start /unix \"${file}\""
 	fi
 }
 
