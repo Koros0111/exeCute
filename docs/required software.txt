@@ -1,6 +1,3 @@
 
 In order to this program to work it requires the following software, or similar versions, to be installed:
-dosbox-svn, q4wine
-
-For better results, also have these:
-wine-mono, wine_gecko
+batman-git, dosbox-svn, q4wine, wine_gecko, wine-mono
