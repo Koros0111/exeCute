@@ -1,3 +1,7 @@
 
 In order to this program to work it requires the following software, or similar versions, to be installed:
-batman-git, dosbox-svn, q4wine, wine_gecko, wine-mono
+- batman-git (gitlab.com/es20490446e/batMan)
+- dosbox-svn
+- q4wine
+- wine_gecko
+- wine-mono
