@@ -1,7 +1,22 @@
 
+
 In order to this program to work it requires the following software, or similar versions, to be installed:
 - batman-git (gitlab.com/es20490446e/batMan)
 - dosbox-svn
 - q4wine
 - wine_gecko
 - wine-mono
+
+
+If you are packaging the program keep those the closest to above and as required dependencies, as far as practicable, for the following reasons:
+
+- batman-git: is the same as exeCute, but for bat files. If excluded applications that rely on a bat file won't work, and there are many.
+
+- dosbox-svn: the stable release of dosbox has been many years ago. The SVN version has many bug fixes and improvements. Games that crash on the stable version don't on the SVN version.
+
+- q4wine: warrants to include an icon to winecfg which allows setting text size, the default being hardly readable on most modern screens. It arranges all the wine icons in a single app, allows to easily edit and remove orphan icons, and provide incredibly useful features.
+
+Ultimately the goal of exeCute is to things just to work. The software should be packaged in a way that makes it easy, even for your mom, to use exe applications without having to ask a rocket scientist. All the basic features shall be discoverable by design.
+
+- wine_gecko and wine-mono: Wine requires these to work. If Wine doesn't find those in the system it will try to download them nowadays. Having them already installed just makes the process faster.
+
