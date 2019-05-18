@@ -1,7 +1,7 @@
 [Desktop Entry]
 Exec=exeCute %f
 Icon=/usr/share/icons/hicolor/scalable/apps/exeCute.svg
-MimeType=application/x-ms-dos-executable;text/x-msdos-batch
+MimeType=application/x-ms-dos-executable;text/plain
 Name=exeCute
 NoDisplay=true
 StartupNotify=true

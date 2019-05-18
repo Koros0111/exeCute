@@ -1,7 +1,6 @@
 
 
 In order to this program to work it requires the following software, or similar versions, to be installed:
-- batman-git (gitlab.com/es20490446e/batMan)
 - dosbox-svn
 - q4wine
 - wine_gecko
@@ -9,8 +8,6 @@ In order to this program to work it requires the following software, or similar 
 
 
 If you are packaging the program keep those the closest to above and as required dependencies, as far as practicable, for the following reasons:
-
-- batman-git: is the same as exeCute, but for bat files. If excluded applications that rely on a bat file won't work, and there are many.
 
 - dosbox-svn: the stable release of dosbox has been many years ago. The SVN version has many bug fixes and improvements. Games that crash on the stable version don't on the SVN version.
 
