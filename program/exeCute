@@ -14,7 +14,7 @@ checkFile () {
 
 	checkFileNotEmpty "${file}"
 	checkFileExist "${file}"
-	checkFileIsExe "${file}"
+	checkFileType "${file}"
 }
 
 
@@ -30,12 +30,12 @@ checkFileExist () {
 }
 
 
-checkFileIsExe () {
+checkFileType () {
 	file="${1}"
 	mime=$(fileMime "${file}")
 
-	if [ "${mime}" != "application/x-dosexec" ]; then
-		echo "Not an exe: ${file}" >&2
+	if [ "${mime}" != "application/x-dosexec" ] && [ "${mime}" != "text/x-msdos-batch" ]; then
+		echo "Not an exe or a bat: ${file}" >&2
 		exit 1
 	fi
 }
@@ -55,12 +55,13 @@ checkFileNotEmpty () {
 
 executeFile () {
 	file="${1}"
+	mime=$(fileMime "${file}")
 	type=$(fileType "${file}")
 
-	if [ "${type}" == "MS-DOS executable" ]; then
-		silently "executeFile" "dosbox \"${file}\" -forcescaler normal2x -exit -fullscreen"
+	if [ "${type}" == "MS-DOS executable" ] || [ "${mime}" == "text/x-msdos-batch" ]; then
+		silently "executeFile" "dosbox \"${file}\" -forcescaler normal2x -fullscreen"
 	else
-		silently "executeFile" "wine start /unix \"${file}\""
+		silently "executeFile" "WINEDEBUG=warn-all,fixme-all wine start /unix \"${file}\""
 	fi
 }
 
