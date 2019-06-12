@@ -61,7 +61,7 @@ executeFile () {
 	if [ "${type}" == "MS-DOS executable" ] || [ "${mime}" == "text/x-msdos-batch" ]; then
 		silently "executeFile" "dosbox \"${file}\" -forcescaler normal2x -fullscreen -exit"
 	else
-		silently "executeFile" "WINEDEBUG=warn-all,fixme-all wine start /unix \"${file}\""
+		silently "executeFile" "WINEDEBUG=warn-all,fixme-all,trace-all wine start /unix \"${file}\""
 	fi
 }
 
