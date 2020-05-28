@@ -1,0 +1,4 @@
+dosbox-staging
+q4wine
+wine-gecko
+wine-mono

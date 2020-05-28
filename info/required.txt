@@ -1,0 +1,2 @@
+/usr/bin/dosbox-staging
+/usr/bin/q4wine
