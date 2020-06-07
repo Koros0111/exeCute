@@ -1,4 +1,4 @@
-dosbox-staging
-q4wine
-wine-gecko
-wine-mono
+"dosbox-staging"  "/usr/bin/dosbox"
+"q4wine"  "/usr/bin/q4wine"
+"wine-gecko"  "/usr/share/wine/gecko/wine-gecko-*"
+"wine-mono"  "/usr/share/wine/mono/wine-mono-*"
