@@ -15,7 +15,7 @@ ls /etc/install-uninstall
 This installer is mostly for trying out the software
 If you end liking it, ask someone how to package it
 
-If your system includes the app "pacman", you can get packages at:
+If your system includes the app "pacman", you can get those packages at:
 https://gitlab.com/es20490446e/express-repository/-/wikis/home
 
 
@@ -27,17 +27,19 @@ https://gitlab.com/es20490446e/install-uninstall.sh
 '
 
 
+# For testing the installer:
+update="true"
+simulate="false"
+clean="false"
+
+# Others:
 here="$(realpath "$(dirname "${0}")")"
 program="$(cd ${here}; echo ${PWD##*/})"
 in="${here}/root"
-
 etc="etc/install-uninstall"
 lists="${etc}/${program}"
 fileList="${lists}/files"
 dirList="${lists}/dirs"
-
-test="false"
-out=""
 
 
 mainFuntion () {
@@ -54,19 +56,12 @@ mainFuntion () {
 builds () {
 	if [ ! -d "${in}" ] && [ -f "${here}/build.sh" ]; then
 		bash "${here}/build.sh"
+		chown --recursive "$(logname)" "${in}"
 	fi
 
 	if [ ! -d "${in}" ] && [ -f "${here}/build.sh" ]; then
 		echo "build.sh hasn't built anything on: ${in}" >&2
 		exit 1
-	fi
-}
-
-
-checkPermissions () {
-	if [ -z "${out}" ] && [ "$(id -u)" -ne 0 ]; then
-		sudo "${0}"
-		exit ${?}
 	fi
 }
 
@@ -105,9 +100,21 @@ checkDependencies () {
 }
 
 
+checkPermissions () {
+	if [ "${simulate}" == "false" ] && [ "$(id -u)" -ne 0 ]; then
+		sudo "${0}"
+		exit ${?}
+	fi
+}
+
+
 cleanUp () {
-	if [ ! -z "${out}" ] && [ -d "${out}" ]; then
-		rm --recursive "/${out}"
+	if [ "${clean}" == "true" ]; then
+		if [ ! -z "${out}" ] && [ -d "${out}" ]; then
+			rm --recursive "/${out}"
+		fi
+	elif [ "${clean}" != "false" ]; then
+		invalidVariable "clean"
 	fi
 }
 
@@ -171,7 +178,7 @@ installSymlink () {
 	target="$(realpath "${in}/${symlink}")"
 
 	makeParents "${symlink}"
-	ln --symbolic "${target}" "${out}/${symlink}"
+	ln --symbolic --force "${target}" "${out}/${symlink}"
 }
 
 
@@ -189,6 +196,15 @@ installs () {
 }
 
 
+invalidVariable () {
+	variable="${1}"
+
+	echo "The variable \"${variable}\" has an invalid value" >&2
+	echo "It can either be \"true\" or \"false\""
+	exit 1
+}
+
+
 makeParents () {
 	file="${1}"
 	parents="$(fileParents "${file}")"
@@ -199,9 +215,21 @@ makeParents () {
 prepareEnvironment () {
 	set -e
 	updateInstaller
+	setOut
 	checkPermissions
 	trap "" INT QUIT TERM EXIT
 	cleanUp
+}
+
+
+setOut () {
+	if [ "${simulate}" == "false" ]; then
+		out=""
+	elif [ "${simulate}" == "true" ]; then
+		out="${here}/simulated install"
+	else
+		invalidVariable "simulate"
+	fi
 }
 
 
@@ -230,20 +258,37 @@ uninstalls () {
 		fi
 	done
 
+	if [ ! -z "${out}" ] && [ -z "$(find "${out}" -not -type d)" ]; then
+		rm --recursive "/${out}"
+	fi
+
 	echo "uninstalled"
 }
 
 
 updateInstaller () {
-	if [ "${test}" == "false" ]; then
+	if [ "${update}" == "true" ]; then
 		remote="$(curl --silent "https://gitlab.com/es20490446e/install-uninstall.sh/-/raw/master/install-uninstall.sh")"
 		local="$(cat "${0}")"
 
-		if [ ! -z "${remote}" ] && [ "${remote}" != "${local}" ]; then
+		if [ -z "${remote}" ]; then
+			if [ -z "$(curl --silent google.com)" ]; then
+				echo "No Internet, which is required" >&2
+			else
+				echo "Cannot get the updated installer" >&2
+				echo "Ask developers to fix this"
+			fi
+
+			exit 1
+		fi
+
+		if [ "${remote}" != "${local}" ]; then
 			echo "${remote}" > "${0}"
 			sudo "${0}"
 			exit ${?}
 		fi
+	elif [ "${update}" != "false" ]; then
+		invalidVariable "update"
 	fi
 }
 
