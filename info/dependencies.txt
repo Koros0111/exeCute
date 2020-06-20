@@ -2,3 +2,5 @@
 "q4wine"  "/usr/bin/q4wine"
 "wine-gecko"  "/usr/share/wine/gecko/wine-gecko-*"
 "wine-mono"  "/usr/share/wine/mono/wine-mono-*"
+"args"  "/usr/bin/args"  "https://gitlab.com/es20490446e/args"
+"so"  "/usr/bin/so"  "https://gitlab.com/es20490446e/so"

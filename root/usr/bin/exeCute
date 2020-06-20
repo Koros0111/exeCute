@@ -2,98 +2,54 @@
 
 
 mainFunction () {
-	file="${1}"
+	file="${@}"
+	lowercaseName="${file,,}"
+	type=$(file --brief "${file}" | cut --delimiter=',' --fields=1)
+	mime=$(file --brief --mime "${file}" | cut --delimiter=';' --fields=1)
+	group=$(echo "${mime}" | cut --delimiter='/' --fields=1)
 
-	checkFile "${file}"
-	executeFile "${file}"
-}
-
-
-checkFile () {
-	file="${1}"
-
-	checkFileNotEmpty "${file}"
-	checkFileExist "${file}"
-	checkFileType "${file}"
-}
-
-
-checkFileExist () {
-	file="${1}"
-
-	if [ ! -f "${file}" ]; then
-		echo "The file doesn't exist: ${file}" >&2
-		echo "If the name was correct either type: exeCute \"pathToYourExeFile\""
-		echo "Or just open with exeCute from the file manager"
-		exit 1
-	fi
-}
-
-
-checkFileType () {
-	file="${1}"
-	mime=$(fileMime "${file}")
-
-	if [ "${mime}" != "application/x-dosexec" ] && [ "${mime}" != "text/x-msdos-batch" ]; then
+	if [[ "${type}" == "MS-DOS executable" ]] || [[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
+		so "-Dos" "dosbox \"${file}\" -fullscreen -exit"
+	elif [[ "${mime}" == "application/x-dosexec" ]]; then
+		so "-Windows" "WINEDEBUG=warn-all,fixme-all,trace-all wine start /unix \"${file}\""
+	else
 		echo "Not an exe or a bat: ${file}" >&2
 		exit 1
 	fi
 }
 
 
-checkFileNotEmpty () {
-	file="${1}"
+checkFileExist () {
+	file="${@}"
 
-	if [ "${file}" == "" ]; then
+	if [[ ! -f "${file}" ]]; then
+		echo "File doesn't exist: ${file}" >&2
+		exit 1
+	fi
+}
+
+
+checkFileNotEmpty () {
+	file="${@}"
+
+	if [[ -z "${file}" ]]; then
 		echo "No file specified" >&2
-		echo "Either type this: exeCute \"pathToYourExeFile\""
+		echo "Either type: exeCute \"pathToYourExeFile\""
 		echo "Or just open with exeCute from the file manager"
 		exit 1
 	fi
 }
 
 
-executeFile () {
-	file="${1}"
-	mime=$(fileMime "${file}")
-	type=$(fileType "${file}")
+prepareEnvironment () {
+	file="${@}"
 
-	if [ "${type}" == "MS-DOS executable" ] || [ "${mime}" == "text/x-msdos-batch" ]; then
-		silently "executeFile" "dosbox \"${file}\" -fullscreen -exit"
-	else
-		silently "executeFile" "WINEDEBUG=warn-all,fixme-all,trace-all wine start /unix \"${file}\""
-	fi
+	set -e
+	checkFileNotEmpty "${file}"
+	checkFileExist "${file}"
 }
 
 
-fileMime () {
-	file="${1}"
-
-	attributes=$(file --brief --mime "${file}")
-	IFS=";" read -r -a attributes <<< "${attributes}"
-	echo "${attributes[0]}"
-}
-
-
-fileType () {
-	file="${1}"
-
-	attributes=$(file --brief "${file}")
-	IFS="," read -r -a attributes <<< "${attributes}"
-	echo "${attributes[0]}"
-}
-
-
-silently () {
-	function="${1}"
-	command="${2}"
-	error=$(eval "${command}" 2>&1 >"/dev/null")
-
-	if [ ${?} -ne 0 ]; then
-		echo "${function}: ${error}" >&2
-		exit 1
-	fi
-}
-
-
-mainFunction "${@}"
+args="$(args "${@}")"
+prepareEnvironment "${args}"
+mainFunction "${args}"
