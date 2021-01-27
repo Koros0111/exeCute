@@ -2,18 +2,18 @@
 
 
 mainFunction () {
-	file="${@}"
-	lowercaseName="${file,,}"
-	type=$(file --brief "${file}")
-	mime=$(file --brief --mime "${file}" | cut --delimiter=';' --fields=1)
-	group=$(echo "${mime}" | cut --delimiter='/' --fields=1)
+	local lowercaseName="${file,,}"
+	local type=$(file --brief "${file}")
+	local mime=$(file --brief --mime "${file}" | cut --delimiter=';' --fields=1)
+	local group=$(echo "${mime}" | cut --delimiter='/' --fields=1)
 
 	if [[ ! -z "$(echo "${type}" | grep "MS-DOS executable")" ]] &&
 	[[ -z "$(echo "${type}" | grep "Windows")" ]] ||
 	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
-		so "-Dos" "dosbox \"${file}\" -fullscreen -exit"
+		dosbox -c "$(mounts)" "${file}" -fullscreen -exit &> /dev/null || true
 	elif [[ "${mime}" == "application/x-dosexec" ]]; then
-		so "-Windows" "WINEDEBUG=warn-all,fixme-all,trace-all wine start /unix \"${file}\""
+		notify-send "Launching $(basename "${file}")" --icon="exeCute" --expire-time="10000"
+		so "-Wine" "WINEDEBUG=warn-all,fixme-all,trace-all wine start /unix \"${file}\""
 	else
 		echo "Not an exe or a bat: ${file}" >&2
 		exit 1
@@ -22,8 +22,6 @@ mainFunction () {
 
 
 checkFileExist () {
-	file="${@}"
-
 	if [[ ! -f "${file}" ]]; then
 		echo "File doesn't exist: ${file}" >&2
 		exit 1
@@ -32,8 +30,6 @@ checkFileExist () {
 
 
 checkFileNotEmpty () {
-	file="${@}"
-
 	if [[ -z "${file}" ]]; then
 		echo "No file specified" >&2
 		echo "Either type: exeCute \"pathToYourExeFile\""
@@ -43,15 +39,48 @@ checkFileNotEmpty () {
 }
 
 
-prepareEnvironment () {
-	file="${@}"
-
-	set -e
-	checkFileNotEmpty "${file}"
-	checkFileExist "${file}"
+isos () {
+		find . -type f \
+			\( \
+				-name "*.iso" -or \
+				-name "*.cue" -or \
+				-name "*.gog" \
+			\) |
+		sort |
+		xargs
 }
 
 
-args="$(args "${@}")"
-prepareEnvironment "${args}"
-mainFunction "${args}"
+mounts () {
+	local isos="$(echo "$(isos)")"
+	
+	if [[ -z "${isos}" ]]; then
+		echo "mount d ."
+	else
+		notifyDiskChangeShortcut "${isos}"
+		echo "imgmount d ${isos} -t iso"
+	fi
+}
+
+
+notifyDiskChangeShortcut () {
+	readarray -t isoList < <(args ${@})
+
+	if [[ "${#isoList[@]}" -gt 1 ]]; then
+		notify-send "For changing disk use: Ctrl+F4" --icon="gtk-cdrom" --expire-time="10000"
+		sleep 10
+	fi
+}
+
+
+prepareEnvironment () {
+	set -e
+	checkFileNotEmpty
+	checkFileExist
+	cd "$(dirname "${file}")"
+}
+
+
+file="$(args "${@}")"
+prepareEnvironment
+mainFunction
