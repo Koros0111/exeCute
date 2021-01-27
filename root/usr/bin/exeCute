@@ -42,9 +42,9 @@ checkFileNotEmpty () {
 isos () {
 		find . -type f \
 			\( \
-				-name "*.iso" -or \
-				-name "*.cue" -or \
-				-name "*.gog" \
+				-iname "*.iso" -or \
+				-iname "*.cue" -or \
+				-iname "*.gog" \
 			\) |
 		sort |
 		xargs
