@@ -52,7 +52,7 @@ isos () {
 
 
 mounts () {
-	local isos="$(echo "$(isos)")"
+	local isos="$(isos)"
 	
 	if [[ -z "${isos}" ]]; then
 		echo "mount d ."
