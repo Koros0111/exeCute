@@ -10,10 +10,11 @@ mainFunction () {
 	if [[ ! -z "$(echo "${type}" | grep "MS-DOS executable")" ]] &&
 	[[ -z "$(echo "${type}" | grep "Windows")" ]] ||
 	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
-		so "-Dos" "dosbox -c \"$(mounts)\" \"${file}\" -fullscreen -exit"
+		so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
 	elif [[ "${mime}" == "application/x-dosexec" ]]; then
 		notify-send "Launching $(basename "${file}")" --icon="exeCute" --expire-time="10000"
-		so "-Wine" "WINEDEBUG=warn-all,fixme-all,trace-all wine start /unix \"${file}\""
+		export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
+		so wine start /unix "${file}"
 	else
 		echo "Not an exe or a bat: ${file}" >&2
 		exit 1
@@ -53,7 +54,7 @@ isos () {
 
 mounts () {
 	isos="$(isos)"
-	
+
 	if [[ -z "${isos}" ]]; then
 		echo "mount d ."
 	else
@@ -75,12 +76,17 @@ notifyDiskChangeShortcut () {
 
 prepareEnvironment () {
 	set -e
+	file="$(args "${@}")"
 	checkFileNotEmpty
 	checkFileExist
 	cd "$(dirname "${file}")"
 }
 
 
-file="$(args "${@}")"
-prepareEnvironment
+so () {
+	/bin/so "-${FUNCNAME[1]}" "${@}"
+}
+
+
+prepareEnvironment "${@}"
 mainFunction
