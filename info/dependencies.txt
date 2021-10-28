@@ -5,3 +5,4 @@
 "wine-mono"  "/usr/share/wine/mono/wine-mono-*"
 "args"  "/usr/bin/args"  "https://gitlab.com/es20490446e/args"
 "so"  "/usr/bin/so"  "https://gitlab.com/es20490446e/so"
+"soundfont-generaluser"  "/usr/share/sounds/sf2/GeneralUser.sf2"  "http://www.schristiancollins.com/generaluser.php"
