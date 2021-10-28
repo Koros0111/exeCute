@@ -13,7 +13,7 @@ mainFunction () {
 		so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
 	elif [[ "${mime}" == "application/x-dosexec" ]]; then
 		notify-send "Launching $(basename "${file}")" --icon="exeCute" --expire-time="10000"
-		export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
+		prepareWineEnvironment
 		so wine start /unix "${file}"
 	else
 		echo "Not an exe or a bat: ${file}" >&2
@@ -36,6 +36,41 @@ checkFileNotEmpty () {
 		echo "Either type: exeCute \"pathToYourExeFile\""
 		echo "Or just open with exeCute from the file manager"
 		exit 1
+	fi
+}
+
+
+cleanupSynth () {
+	if [[ -n "${synth}" ]]; then
+		so kill "${synth}"
+	fi
+}
+
+
+cleanupWineEnvironment () {
+	cleanupSynth
+	restoreResolution
+}
+
+
+currentResolution () {
+	xdpyinfo |
+	grep dimensions |
+	cut --delimiter=' ' --fields=7
+}
+
+
+desktopsLine () {
+	local userReg="${1}"
+
+	local line; line="$(
+		grep --line-number "Desktops" "${userReg}" |
+		cut --delimiter=':' --fields=1
+	)"
+
+	if [[ -n "${line}" ]]; then
+		line="$((line + 2))"
+		echo "${line}"
 	fi
 }
 
@@ -83,8 +118,93 @@ prepareEnvironment () {
 }
 
 
+prepareWineEnvironment () {
+	previousResolution="$(currentResolution)"
+	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
+	setDesktopResolution
+	startSynth
+	export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
+}
+
+
+restoreResolution () {
+	so xrandr --size "${previousResolution}"
+}
+
+
+setDesktopResolution () {
+	local targetResolution; targetResolution="$(targetResolution)"
+
+	if [[ -z "${targetResolution}" ]]; then
+		setVirtualDesktopResolution ""
+	elif ! xrandr | grep --quiet "${targetResolution}"; then
+		echo "desktop.conf: Unsupported resolution: ${targetResolution}" >&2
+	else
+		setVirtualDesktopResolution "${targetResolution}"
+		so xrandr --size "${targetResolution}"
+	fi
+}
+
+
+setVirtualDesktopResolution () {
+	local targetResolution="${1}"
+	local userReg="${HOME}/.wine/user.reg"
+
+	if [[ ! -f "${userReg}" ]]; then
+		wine - &> /dev/null || true
+	fi
+
+	local line; line="$(desktopsLine "${userReg}")"
+
+	if [[ -z "${line}" ]]; then
+		echo '[Software\\Wine\\Explorer\\Desktops] 1635388843' >> "${userReg}"
+		echo '#time=1d7cba5344b505e' >> "${userReg}"
+		echo '"Default"="'${targetResolution}'"' >> "${userReg}"
+	else
+		sed --in-place "${line}s/.*/\"Default\"=\"${targetResolution}\"\n/" "${userReg}"
+	fi
+}
+
+
 so () {
 	/bin/so "-${FUNCNAME[1]}" "${@}"
+}
+
+
+startSynth () {
+	synth=""
+
+	if ! userProcessIsRunning "$USER" "fluidsynth"; then
+		fluidsynth -si -a alsa -m alsa_seq -C no -g 0.5 -L 1 -r 48000 -R yes -z 1024 \
+			-o synth.default-soundfont="/usr/share/soundfonts/GeneralUser.sf2" &> /dev/null &
+		synth="$!"
+	fi
+}
+
+
+targetResolution () {
+	local fileDir="$(dirname "${file}")"
+	local conf="${fileDir}/desktop.conf"
+	local targetResolution=""
+
+	if [[ -f "${conf}" ]]; then
+		targetResolution="$(cat "${conf}")"
+
+		if [[ -z "${targetResolution}" ]]; then
+			targetResolution="$(currentResolution)"
+		fi
+	fi
+
+	echo "${targetResolution}"
+}
+
+
+userProcessIsRunning () {
+	local user="${1}"
+	local process="${2}"
+
+	ps -u "${user}" |
+	grep -q "${process}"
 }
 
 

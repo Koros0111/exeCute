@@ -3,6 +3,7 @@
 .SH NAME
 exeCute - opens exe and bat files as if they were native Linux applications
 
+
 .SH LAUNCHING
 
 .TP
@@ -13,7 +14,17 @@ Right click on the intended file, and select open with exeCute.
 .SS ON THE TERMINAL
 exeCute [filePath]
 
-.SH AUTOMOUNTING DISK IMAGES
+
+.SH USING A VIRTUAL DESKTOP
+
+If a Windows application doesn't show properly, you can try launching it on a virtual desktop.
+
+For that, in the application directory, create a file named 'desktop.conf'.
+
+If you want the desktop to have a particular resolution, type it inside that file.
+
+
+.SH AUTOMOUNTING MS-DOS DISK IMAGES
 
 - exeCute will automount any disk images under the launched program folder, on drive 'D'.
 
