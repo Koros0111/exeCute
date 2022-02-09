@@ -7,8 +7,8 @@ mainFunction () {
 	mime="$(file --brief --mime-type "${file}")"
 	group="$(echo "${mime}" | cut --delimiter='/' --fields=1)"
 
-	if [[ ! -z "$(echo "${type}" | grep "MS-DOS executable")" ]] &&
-	[[ -z "$(echo "${type}" | grep "Windows")" ]] ||
+	if (echo "${type}" | grep --quiet "MS-DOS executable") &&
+	(echo "${type}" | grep --quiet "Windows") ||
 	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
 		so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
 	elif [[ "${mime}" == "application/x-dosexec" ]]; then
@@ -42,7 +42,8 @@ checkFileNotEmpty () {
 
 cleanupSynth () {
 	if [[ -n "${synth}" ]]; then
-		so kill "${synth}"
+		kill -KILL "${synth}"
+		wait "${synth}" 2>/dev/null
 	fi
 }
 
@@ -100,7 +101,7 @@ mounts () {
 
 
 notifyDiskChangeShortcut () {
-	readarray -t isoList < <(args ${@})
+	readarray -t isoList < <(args "${@}")
 
 	if [[ "${#isoList[@]}" -gt 1 ]]; then
 		notify-send "For changing disk use: Ctrl+F4" --icon="gtk-cdrom" --expire-time="10000"
@@ -157,8 +158,10 @@ setVirtualDesktopResolution () {
 	local line; line="$(desktopsLine "${userReg}")"
 
 	if [[ -z "${line}" ]]; then
+		# shellcheck disable=SC2129
 		echo '[Software\\Wine\\Explorer\\Desktops] 1635388843' >> "${userReg}"
 		echo '#time=1d7cba5344b505e' >> "${userReg}"
+		# shellcheck disable=SC2086
 		echo '"Default"="'${targetResolution}'"' >> "${userReg}"
 	else
 		sed --in-place "${line}s/.*/\"Default\"=\"${targetResolution}\"\n/" "${userReg}"
@@ -183,7 +186,7 @@ startSynth () {
 
 
 targetResolution () {
-	local fileDir="$(dirname "${file}")"
+	local fileDir; fileDir="$(dirname "${file}")"
 	local conf="${fileDir}/desktop.conf"
 	local targetResolution=""
 
@@ -203,8 +206,8 @@ userProcessIsRunning () {
 	local user="${1}"
 	local process="${2}"
 
-	ps -u "${user}" |
-	grep -q "${process}"
+	pgrep -u "${user}" |
+	grep --quiet "${process}"
 }
 
 
