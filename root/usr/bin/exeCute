@@ -7,8 +7,8 @@ mainFunction () {
 	mime="$(file --brief --mime-type "${file}")"
 	group="$(echo "${mime}" | cut --delimiter='/' --fields=1)"
 
-	if (echo "${type}" | grep --quiet "MS-DOS executable") &&
-	(echo "${type}" | grep --quiet "Windows") ||
+	if hasSubstring "${type}" "MS-DOS executable" &&
+	! hasSubstring "${type}" "Windows" ||
 	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
 		so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
 	elif [[ "${mime}" == "application/x-dosexec" ]]; then
@@ -73,6 +73,14 @@ desktopsLine () {
 		line="$((line + 2))"
 		echo "${line}"
 	fi
+}
+
+
+hasSubstring () {
+	local string="${1}"
+	local substring="${2}"
+
+	echo "${string}" | grep --quiet "${substring}"
 }
 
 
