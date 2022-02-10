@@ -100,7 +100,7 @@ mounts () {
 	isos="$(isos)"
 
 	if [[ -z "${isos}" ]]; then
-		echo "mount d ."
+		echo "mount d . -t cdrom"
 	else
 		notifyDiskChangeShortcut "${isos}"
 		echo "imgmount d ${isos} -t iso"
