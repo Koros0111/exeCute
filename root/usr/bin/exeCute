@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 
 
 mainFunction () {
@@ -42,15 +43,14 @@ checkFileNotEmpty () {
 
 cleanupSynth () {
 	if [[ -n "${synth}" ]]; then
-		kill -KILL "${synth}"
-		wait "${synth}" 2>/dev/null
+		kill -KILL "${synth}" 2>/dev/null
 	fi
 }
 
 
 cleanupWineEnvironment () {
-	cleanupSynth
 	restoreResolution
+	cleanupSynth
 }
 
 
@@ -119,8 +119,9 @@ notifyDiskChangeShortcut () {
 
 
 prepareEnvironment () {
-	set -e
-	file="$(args "${@}")"
+	readarray -t args < <(args "${@}")
+	file="${args[*]}"
+
 	checkFileNotEmpty
 	checkFileExist
 	cd "$(dirname "${file}")"
@@ -129,6 +130,7 @@ prepareEnvironment () {
 
 prepareWineEnvironment () {
 	previousResolution="$(currentResolution)"
+
 	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
 	setDesktopResolution
 	startSynth
