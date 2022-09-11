@@ -49,7 +49,7 @@ cleanupSynth () {
 
 
 cleanupWineEnvironment () {
-	restoreResolution
+	restoreScreenConfig
 	cleanupSynth
 }
 
@@ -138,8 +138,9 @@ prepareWineEnvironment () {
 }
 
 
-restoreResolution () {
+restoreScreenConfig () {
 	so xrandr --size "${previousResolution}"
+	so xgamma -gamma 1
 }
 
 
