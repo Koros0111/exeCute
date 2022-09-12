@@ -42,17 +42,10 @@ checkFileNotEmpty () {
 }
 
 
-cleanupSynth () {
-	if [[ -n "${synth}" ]]; then
-		kill -KILL "${synth}" 2>/dev/null
-	fi
-}
-
-
 cleanupWineEnvironment () {
 	so rm --recursive --force "${cache}"
 	restoreScreenConfig
-	cleanupSynth
+	so killall fluidsynth
 }
 
 
@@ -202,12 +195,9 @@ so () {
 
 
 startSynth () {
-	synth=""
-
 	if ! userProcessIsRunning "$USER" "fluidsynth"; then
 		fluidsynth -si -a alsa -m alsa_seq -C no -g 0.5 -L 1 -r 48000 -R yes -z 1024 \
 			-o synth.default-soundfont="/usr/share/soundfonts/GeneralUser.sf2" &> /dev/null &
-		synth="$!"
 	fi
 }
 
