@@ -15,7 +15,7 @@ mainFunction () {
 	! hasSubstring "${type}" "Windows" ||
 	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
 		so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
-	elif [[ "${mime}" == "application/x-dosexec" ]]; then
+	elif [[ "${mime}" == "application/vnd.microsoft.portable-executable" ]]; then
 		launchWindowsProgram "${file}"
 	else
 		echo "Not an exe or a bat: ${file}" >&2
