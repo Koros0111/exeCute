@@ -6,16 +6,11 @@ outputCache="${cache}/output"
 
 
 mainFunction () {
-	lowercaseName="${file,,}"
-	type="$(file --brief "${file}")"
 	mime="$(file --brief --mime-type "${file}")"
-	group="$(echo "${mime}" | cut --delimiter='/' --fields=1)"
 
-	if hasSubstring "${type}" "MS-DOS executable" &&
-	! hasSubstring "${type}" "Windows" ||
-	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]; then
-		so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
-	elif [[ "${mime}" == "application/vnd.microsoft.portable-executable" ]]; then
+	if fileIsDosProgram "${file}" "${mime}"; then
+		launchDosProgram "${file}"
+	elif fileIsWindowsProgram "${mime}"; then
 		launchWindowsProgram "${file}"
 	else
 		echo "Not an exe or a bat: ${file}" >&2
@@ -71,6 +66,28 @@ desktopsLine () {
 }
 
 
+fileIsDosProgram () {
+	local file="${1}"
+	local mime="${2}"
+
+	local lowercaseName; lowercaseName="${file,,}"
+	local type; type="$(file --brief "${file}")"
+	local group; group="$(echo "${mime}" | cut --delimiter='/' --fields=1)"
+
+	hasSubstring "${type}" "MS-DOS executable" &&
+	! hasSubstring "${type}" "Windows" ||
+	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]
+}
+
+
+fileIsWindowsProgram () {
+	local mime="${1}"
+
+	[[ "${mime}" == "application/vnd.microsoft.portable-executable" ]] ||
+	[[ "${mime}" == "application/x-ms-ne-executable" ]]
+}
+
+
 hasSubstring () {
 	local string="${1}"
 	local substring="${2}"
@@ -88,6 +105,13 @@ isos () {
 		\) |
 	sort |
 	xargs
+}
+
+
+launchDosProgram () {
+	local file="${1}"
+
+	so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
 }
 
 
