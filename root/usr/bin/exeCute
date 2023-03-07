@@ -44,6 +44,21 @@ cleanupWineEnvironment () {
 }
 
 
+createWineDir () {
+	if [[ ! -d "${HOME}/.wine" ]]; then
+		wine - &> /dev/null || true
+
+		# wine exits before its child finishes creating files
+		# so we wait for the actual files to be created
+		# "user.reg" is the last created file by wine
+
+		while [[ ! -f "${HOME}/.wine/user.reg" ]]; do
+			sleep 0.1
+		done
+	fi
+}
+
+
 currentResolution () {
 	xdpyinfo |
 	grep dimensions |
@@ -74,6 +89,7 @@ fileIsDosProgram () {
 	local type; type="$(file --brief "${file}")"
 	local group; group="$(echo "${mime}" | cut --delimiter='/' --fields=1)"
 
+	#shellcheck disable=SC2015
 	hasSubstring "${type}" "MS-DOS executable" &&
 	! hasSubstring "${type}" "Windows" ||
 	[[ "${group}" == "text" && "${lowercaseName: -4}" == ".bat" ]]
@@ -164,6 +180,7 @@ prepareWineEnvironment () {
 	previousResolution="$(currentResolution)"
 
 	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
+	createWineDir
 	so mkdir --parents "${cache}"
 	setDesktopResolution
 	startSynth
@@ -194,15 +211,10 @@ setDesktopResolution () {
 setVirtualDesktopResolution () {
 	local targetResolution="${1}"
 	local userReg="${HOME}/.wine/user.reg"
-
-	if [[ ! -f "${userReg}" ]]; then
-		wine - &> /dev/null || true
-	fi
-
 	local line; line="$(desktopsLine "${userReg}")"
 
 	if [[ -z "${line}" ]]; then
-		# shellcheck disable=SC2129
+		# shellcheck disable=SC2028,SC2129
 		echo '[Software\\Wine\\Explorer\\Desktops] 1635388843' >> "${userReg}"
 		echo '#time=1d7cba5344b505e' >> "${userReg}"
 		# shellcheck disable=SC2086
