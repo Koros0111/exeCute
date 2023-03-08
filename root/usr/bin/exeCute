@@ -175,7 +175,7 @@ killCommandIfRunning () {
 launchDosProgram () {
 	local file="${1}"
 
-	so dosbox -c "$(mounts)" "${file}" -fullscreen -exit
+	so dosbox -c "$(mounts)" "${file}" -fullscreen
 }
 
 
