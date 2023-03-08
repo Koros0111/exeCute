@@ -6,6 +6,7 @@
 "q4wine"  "/usr/bin/q4wine"
 "so"  "/usr/bin/so"  "https://gitlab.com/es20490446e/so"
 "soundfont-generaluser"  "/usr/share/sounds/sf2/GeneralUser.sf2"  "http://www.schristiancollins.com/generaluser.php"
+"vDisc"  "/usr/bin/vDisc"  "https://gitlab.com/es20490446e/vDisc"
 "wine-gecko"  "/usr/share/wine/gecko/wine-gecko-*"
 "wine-mono"  "/usr/share/wine/mono/wine-mono-*"
 "xorg-xdpyinfo"  "/usr/bin/xdpyinfo"
