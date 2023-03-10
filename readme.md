@@ -6,10 +6,6 @@ LAUNCHING
           ON THE TERMINAL
               exeCute [filePath]
 
-WINDOWS DISCS
-       - If you open any disc image with vDisc, any Windows program will  rec‐
-       ognize it as an optical disc inserted on drive D.
-
 MS-DOS DISCS
        - If the launched program folder contains any disc images, they will be
        made available on drive D.

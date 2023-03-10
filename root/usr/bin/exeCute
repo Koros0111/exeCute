@@ -19,28 +19,6 @@ mainFunction () {
 }
 
 
-addRealDiscDrives () {
-	local drive
-	local drives; readarray -t drives < <(realDiscDrives)
-	local letters=(e f g h i j k l m n o p q r s t u v w x y)
-	local index=0
-
-	for drive in "${drives[@]}"; do
-		if [[ "${index}" -lt "${#letters[@]}" ]]; then
-			so ln --symbolic "${drive}" "${HOME}/.wine/dosdevices/${letters[$index]}::"
-			index=$((index + 1))
-		fi
-	done
-}
-
-
-addStaticDrives () {
-	so ln --symbolic "../drive_c" "${HOME}/.wine/dosdevices/c:"
-	so ln --symbolic "../../.vDisc" "${HOME}/.wine/dosdevices/d:"
-	so ln --symbolic "/" "${HOME}/.wine/dosdevices/z:"
-}
-
-
 checkFileExist () {
 	if [[ ! -f "${file}" ]]; then
 		echo "File doesn't exist: ${file}" >&2
@@ -63,16 +41,6 @@ cleanupWineEnvironment () {
 	so rm --recursive --force "${cache}"
 	restoreScreenConfig
 	killCommandIfRunning fluidsynth
-}
-
-
-configureVdisc () {
-	if ! vDiscIsConfigured; then
-		removeDrives
-		addStaticDrives
-		addRealDiscDrives
-		setDasCDrom
-	fi
 }
 
 
@@ -110,13 +78,6 @@ desktopsLine () {
 		line="$((line + 2))"
 		echo "${line}"
 	fi
-}
-
-
-drivesLineNumber () {
-	grep --line-number 'Wine\\\\Drives' "${HOME}/.wine/system.reg" |
-	cut --delimiter=':' --fields=1 |
-	head -n1
 }
 
 
@@ -229,7 +190,6 @@ prepareWineEnvironment () {
 
 	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
 	createWineDir
-	configureVdisc
 	so mkdir --parents "${cache}"
 	setDesktopResolution
 	startSynth
@@ -237,55 +197,9 @@ prepareWineEnvironment () {
 }
 
 
-realDiscDrives () {
-	find "/dev" -maxdepth 1 -name "sr*" |
-	sort
-}
-
-
-removeDrives () {
-	local drive
-	local drives=(a b c d e f g h i j k l m n o p q r s t u v w x y z)
-
-	for drive in "${drives[@]}"; do
-		so rm --force "${HOME}/.wine/dosdevices/${drive}:"
-		so rm --force "${HOME}/.wine/dosdevices/${drive}::"
-	done
-}
-
-
 restoreScreenConfig () {
 	so xrandr --size "${previousResolution}"
 	so xgamma -gamma 1
-}
-
-
-setDasCDrom () {
-	local reg="${HOME}/.wine/system.reg"
-
-	if ! grep --quiet '"d:"="cdrom"' "${reg}"; then
-		local line; line="$(drivesLineNumber)"
-
-		if [[ -z "${line}" ]]; then
-			echo there
-			makeDrivesRegHeader
-			line="$(drivesLineNumber)"
-		fi
-
-		line=$((line + 1))
-		local contents; contents="$(sed --quiet "${line}p" "${reg}")"
-		sed --in-place "/${contents}/a \"d:\"=\"cdrom\"" "${reg}"
-	fi
-}
-
-
-makeDrivesRegHeader () {
-	local reg="${HOME}/.wine/system.reg"
-	local epoch; epoch="$(date +%s)"
-
-	#shellcheck disable=SC2028
-	echo '[Software\\Wine\\Drives]' "${epoch}" >> "${reg}"
-	printf '#time=0\n' >> "${reg}"
 }
 
 
@@ -356,19 +270,6 @@ userProcessIsRunning () {
 
 	pgrep -u "${user}" |
 	grep --quiet "${process}"
-}
-
-
-vDiscIsConfigured () {
-	if [[ ! -L "${HOME}/.wine/dosdevices/d::" ]]; then
-		false
-	elif [[ "$(readlink "${HOME}/.wine/dosdevices/d::")" != "../../.vDisc" ]]; then
-		false
-	elif ! grep "d:"="cdrom" "${HOME}/.wine/system.reg"; then
-		false
-	else
-		true
-	fi
 }
 
 
