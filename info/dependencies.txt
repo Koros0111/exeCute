@@ -10,3 +10,4 @@
 "wine-mono"  "/usr/share/wine/mono/wine-mono-*"
 "xorg-xdpyinfo"  "/usr/bin/xdpyinfo"
 "xorg-xgamma"  "/usr/bin/xgamma"
+
