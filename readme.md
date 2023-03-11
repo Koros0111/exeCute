@@ -6,6 +6,10 @@ LAUNCHING
           ON THE TERMINAL
               exeCute [filePath]
 
+WINDOWS DISCS
+       - For inserting a disc image, right click on it and select  "open  with
+       vDisc".
+
 MS-DOS DISCS
        - If the launched program folder contains any disc images, they will be
        made available on drive D.
