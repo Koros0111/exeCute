@@ -41,6 +41,7 @@ cleanupWineEnvironment () {
 	so rm --recursive --force "${cache}"
 	restoreScreenConfig
 	killCommandIfRunning fluidsynth
+	ejectVdisc
 }
 
 
@@ -81,6 +82,13 @@ desktopsLine () {
 }
 
 
+ejectVdisc () {
+	if [[ -n "${vdisc}" ]]; then
+		vDisc
+	fi
+}
+
+
 fileIsDosProgram () {
 	local file="${1}"
 	local mime="${2}"
@@ -109,6 +117,19 @@ hasSubstring () {
 	local substring="${2}"
 
 	echo "${string}" | grep --quiet "${substring}"
+}
+
+
+insertVdisc () {
+	vdisc=""
+
+	if [[ ! -f "${HOME}/.config/vDisc/link" ]]; then
+		vdisc="$(vdisc)"
+
+		if [[ -n "${vdisc}" ]]; then
+			vDisc "${vdisc}"
+		fi
+	fi
 }
 
 
@@ -194,6 +215,7 @@ prepareWineEnvironment () {
 	setDesktopResolution
 	startSynth
 	export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
+	insertVdisc
 }
 
 
@@ -270,6 +292,29 @@ userProcessIsRunning () {
 
 	pgrep -u "${user}" |
 	grep --quiet "${process}"
+}
+
+
+vdisc () {
+	vdiscFormats |
+	xargs printf '-iname \"*.%s\" -or ' |
+	rev |
+	cut --delimiter=' ' --fields 3- |
+	rev |
+	xargs find . -type f |
+	sort |
+	head -n1
+}
+
+
+vdiscFormats () {
+	cdemu enum-parsers |
+	grep --invert-match 'audio' |
+	grep "(" | cut --delimiter='(' --fields=2- |
+	tr -d '*.,)' |
+	tr ' ' '\n' |
+	sort --unique |
+	grep --invert-match 'bin'
 }
 
 

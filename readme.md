@@ -7,17 +7,21 @@ LAUNCHING
               exeCute [filePath]
 
 WINDOWS DISCS
-       - For inserting a disc image, right click on it and select  "open  with
-       vDisc".
+       - If the launched program folder contains any disc images, and none  is
+       inserted  into  a virtual disc drive, the first one alphabetically will
+       be automatically inserted.
+
+       - For manually inserting any other disc image, right click  on  it  and
+       select "open with vDisc".
 
 MS-DOS DISCS
        - If the launched program folder contains any disc images, they will be
-       made available on drive D.
+       made available automatically on drive D.
 
        - If there are multiple images, you can change among them with: Control
        + F4.
 
-       - Compatible disk images are '.iso', '.cue' and '.gog'.
+       - Compatible disc images are '.iso', '.cue' and '.gog'.
 
        -  If  there is no disc image, the launched program folder will be made
        also available on drive D.
