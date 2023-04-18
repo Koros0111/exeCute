@@ -77,6 +77,12 @@ desktopsLine () {
 }
 
 
+dword () {
+	local number="${1}"
+	printf '%.8X\n' "${number}"
+}
+
+
 ejectVdisc () {
 	if [[ -n "${vdisc}" ]]; then
 		vDisc
@@ -104,6 +110,15 @@ fileIsWindowsProgram () {
 
 	[[ "${mime}" == "application/vnd.microsoft.portable-executable" ]] ||
 	[[ "${mime}" == "application/x-ms-ne-executable" ]]
+}
+
+
+graphicsDriver () {
+	lspci -v |
+	grep --after-context=12 VGA |
+	grep "Kernel driver in use:" |
+	cut --delimiter=":" --fields=2 |
+	xargs
 }
 
 
@@ -144,7 +159,12 @@ installDxvk () {
 	local reg="${HOME}/.wine/user.reg"
 
 	if [[ ! -f "${reg}" ]] || ! grep --quiet '"dxgi"="native"' "${reg}"; then
-		so dxvk install
+		if [[ "$(graphicsDriver)" == "radeon" ]]; then
+			so wineboot --update
+			waitUserReg
+		else
+			so dxvk install
+		fi
 	fi
 }
 
@@ -328,6 +348,18 @@ vdiscFormats () {
 	sort --unique |
 	grep --invert-match 'bin'
 }
+
+
+waitUserReg () {
+	# wine exits before its children finishes creating files
+	# so we wait for the actual files to be created
+	# "user.reg" is the last created one
+
+	while [[ ! -f "${HOME}/.wine/user.reg" ]]; do
+		sleep 0.1
+	done
+}
+
 
 
 prepareEnvironment "${@}"
