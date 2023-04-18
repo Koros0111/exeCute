@@ -60,10 +60,20 @@ createWineDir () {
 }
 
 
+currentRate () {
+	xrandr --current |
+	tr ' ' '\n' |
+	grep "[[:digit:]]\*" |
+	tr -d '*' |
+	head -n1
+}
+
+
 currentResolution () {
-	xdpyinfo |
-	grep dimensions |
-	cut --delimiter=' ' --fields=7
+	xrandr --current |
+	grep "[[:digit:]]\*" |
+	cut --delimiter=' ' --fields=4 |
+	head -n1
 }
 
 
@@ -145,6 +155,15 @@ isos () {
 }
 
 
+installDxvk () {
+	local err
+
+	if [[ -e "/usr/bin/setup_dxvk" ]] && ! grep --quiet '"dxgi"="native"' "${HOME}/.wine/user.reg"; then
+		so setup_dxvk install
+	fi
+}
+
+
 killCommandIfRunning () {
 	local command="${1}"
 
@@ -208,19 +227,28 @@ prepareEnvironment () {
 
 prepareWineEnvironment () {
 	previousResolution="$(currentResolution)"
+	previousRate="$(currentRate)"
+	export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
 
 	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
 	createWineDir
+	installDxvk
 	so mkdir --parents "${cache}"
 	setDesktopResolution
 	startSynth
-	export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
 	insertVdisc
 }
 
 
+primaryDisplay () {
+	xrandr --current |
+	grep "connected primary" |
+	cut --delimiter=' ' --fields=1
+}
+
+
 restoreScreenConfig () {
-	so xrandr --size "${previousResolution}"
+	so xrandr --output "$(primaryDisplay)" --mode "${previousResolution}" --rate "${previousRate}"
 	so xgamma -gamma 1
 }
 

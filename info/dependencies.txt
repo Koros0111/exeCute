@@ -1,6 +1,7 @@
 
 "args"  "/usr/bin/args"  "https://gitlab.com/es20490446e/args"
 "dosbox-staging"  "/usr/bin/dosbox"
+"dxvk"  "/usr/share/dxvk/x64/dxgi.dll"  "https://github.com/doitsujin/dxvk"
 "fluidsynth"  "/usr/bin/fluidsynth"
 "libnotify"  "usr/bin/notify-send"
 "q4wine"  "/usr/bin/q4wine"
