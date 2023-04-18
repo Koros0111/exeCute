@@ -45,21 +45,6 @@ cleanupWineEnvironment () {
 }
 
 
-createWineDir () {
-	if [[ ! -d "${HOME}/.wine" ]]; then
-		wine - &> /dev/null || true
-
-		# wine exits before its child finishes creating files
-		# so we wait for the actual files to be created
-		# "user.reg" is the last created file by wine
-
-		while [[ ! -f "${HOME}/.wine/user.reg" ]]; do
-			sleep 0.1
-		done
-	fi
-}
-
-
 currentRate () {
 	xrandr --current |
 	tr ' ' '\n' |
@@ -156,10 +141,10 @@ isos () {
 
 
 installDxvk () {
-	local err
+	local reg="${HOME}/.wine/user.reg"
 
-	if [[ -e "/usr/bin/setup_dxvk" ]] && ! grep --quiet '"dxgi"="native"' "${HOME}/.wine/user.reg"; then
-		so setup_dxvk install
+	if [[ ! -f "${reg}" ]] || ! grep --quiet '"dxgi"="native"' "${reg}"; then
+		so dxvk install
 	fi
 }
 
@@ -231,7 +216,6 @@ prepareWineEnvironment () {
 	export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
 
 	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
-	createWineDir
 	installDxvk
 	so mkdir --parents "${cache}"
 	setDesktopResolution
