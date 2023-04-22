@@ -252,8 +252,11 @@ primaryDisplay () {
 
 
 restoreScreenConfig () {
-	so xrandr --output "$(primaryDisplay)" --mode "${previousResolution}" --rate "${previousRate}"
-	so xgamma -gamma 1
+	if [[ "$(currentResolution)" != "${previousResolution}" ]] ||
+	[[ "$(currentRate)" != "${previousRate}" ]]; then
+		so xrandr --output "$(primaryDisplay)" --mode "${previousResolution}" --rate "${previousRate}"
+		so xgamma -gamma 1
+	fi
 }
 
 

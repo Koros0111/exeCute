@@ -1,7 +1,6 @@
 
 "args"  "/usr/bin/args"  "https://gitlab.com/es20490446e/args"
 "dosbox-staging"  "/usr/bin/dosbox"
-"dxvk"  "/usr/share/dxvk/x64/dxgi.dll"  "https://github.com/doitsujin/dxvk"
 "dxvk-installer"  "/usr/bin/dxvk"  "https://gitlab.com/es20490446e/dxvk-installer"
 "fluidsynth"  "/usr/bin/fluidsynth"
 "libnotify"  "usr/bin/notify-send"
