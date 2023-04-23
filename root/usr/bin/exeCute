@@ -220,6 +220,12 @@ notifyDiskChangeShortcut () {
 }
 
 
+optimalDpi () {
+	local height; height="$(echo "${previousResolution}" | cut --delimiter='x' --fields=2)"
+	solve "int(${height}/5.45)"
+}
+
+
 prepareEnvironment () {
 	readarray -t args < <(args "${@}")
 	file="${args[*]}"
@@ -241,6 +247,7 @@ prepareWineEnvironment () {
 	setDesktopResolution
 	startSynth
 	insertVdisc
+	setDpi
 }
 
 
@@ -271,6 +278,13 @@ setDesktopResolution () {
 		setVirtualDesktopResolution "${targetResolution}"
 		so xrandr --size "${targetResolution}"
 	fi
+}
+
+
+setDpi () {
+	local reg="${HOME}/.wine/user.reg"
+	local dword; dword="$(dword "$(optimalDpi)")"
+	sed --in-place "s|\"LogPixels\"=dword:........|\"LogPixels\"=dword:${dword}|g" "${reg}"
 }
 
 
