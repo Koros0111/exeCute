@@ -113,15 +113,6 @@ fileIsWindowsProgram () {
 }
 
 
-graphicsDriver () {
-	lspci -v |
-	grep --after-context=12 VGA |
-	grep "Kernel driver in use:" |
-	cut --delimiter=":" --fields=2 |
-	xargs
-}
-
-
 hasSubstring () {
 	local string="${1}"
 	local substring="${2}"
