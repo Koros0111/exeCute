@@ -1,7 +1,6 @@
 
 "args"  "/usr/bin/args"  "https://gitlab.com/es20490446e/args"
 "dosbox-staging"  "/usr/bin/dosbox"
-"dxvk-installer"  "/usr/bin/dxvk"  "https://gitlab.com/es20490446e/dxvk-installer"
 "fluidsynth"  "/usr/bin/fluidsynth"
 "libnotify"  "usr/bin/notify-send"
 "q4wine"  "/usr/bin/q4wine"
@@ -11,6 +10,7 @@
 "vDisc"  "/usr/bin/vDisc"  "https://gitlab.com/es20490446e/vDisc"
 "wine-gecko"  "/usr/share/wine/gecko/wine-gecko-*"
 "wine-mono"  "/usr/share/wine/mono/wine-mono-*"
+"wine-vulkanizer"  "/usr/bin/vulkanizer"  "https://gitlab.com/es20490446e/wine-vulkanizer"
 "xorg-xdpyinfo"  "/usr/bin/xdpyinfo"
 "xorg-xgamma"  "/usr/bin/xgamma"
 

@@ -155,20 +155,6 @@ isos () {
 }
 
 
-installDxvk () {
-	local reg="${HOME}/.wine/user.reg"
-
-	if [[ ! -f "${reg}" ]] || ! grep --quiet '"dxgi"="native"' "${reg}"; then
-		if [[ "$(graphicsDriver)" == "radeon" ]]; then
-			so wineboot --update
-			waitUserReg
-		else
-			so dxvk install
-		fi
-	fi
-}
-
-
 killCommandIfRunning () {
 	local command="${1}"
 
@@ -242,7 +228,7 @@ prepareWineEnvironment () {
 	export WINEDEBUG=err+all,fixme-all,warn-all,trace-all
 
 	trap "cleanupWineEnvironment" INT TERM QUIT ERR EXIT
-	installDxvk
+	vulkanizer
 	so mkdir --parents "${cache}"
 	setDesktopResolution
 	startSynth
