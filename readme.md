@@ -35,3 +35,22 @@ VIRTUAL DESKTOP
 
        If you want the desktop to have a particular resolution, type it inside
        that file.
+
+FEATURES
+       - Selects if to launch with Wine or Dosbox.
+
+       -  Mounts  any  disc image found in the executable folder, simulating a
+       physical disc.
+
+       - Makes DirectX 3D applications run fast by using Vulkan as backend, if
+       supported.
+
+       - Scale windows to be pleasant to read on the current resolution.
+
+       - Restores desktop resolution, framerate and gamma when the application
+       closes.
+
+       - Enables quality midi music through  Fluidsynth  and  the  GeneralUser
+       soundfont.
+
+       - Simulates a virtual desktop of the chosen resolution.
