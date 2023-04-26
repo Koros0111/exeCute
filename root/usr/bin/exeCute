@@ -109,7 +109,8 @@ fileIsWindowsProgram () {
 	local mime="${1}"
 
 	[[ "${mime}" == "application/vnd.microsoft.portable-executable" ]] ||
-	[[ "${mime}" == "application/x-ms-ne-executable" ]]
+	[[ "${mime}" == "application/x-ms-ne-executable" ]] ||
+	[[ "${mime}" == "application/x-dosexec" ]]
 }
 
 
